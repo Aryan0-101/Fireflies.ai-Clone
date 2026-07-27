@@ -1,8 +1,6 @@
 "use client";
 
 import {
-  Activity,
-  BarChart3,
   Bell,
   Bot,
   CalendarDays,
@@ -12,43 +10,45 @@ import {
   CircleHelp,
   ExternalLink,
   Gift,
-  Home,
   Laptop,
   Layers3,
   LogOut,
   Menu,
-  Mic,
   MonitorUp,
   Search,
   Settings,
   ShieldCheck,
-  Sparkles,
-  Star,
-  Upload,
   UserRound,
-  Users,
   Video,
-  WandSparkles,
   X,
-  Zap,
   Info,
-  Lock,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, FormEvent, ReactNode, useContext, useEffect, useState } from "react";
 import { FirefliesMark, FredMark } from "./brand";
+import {
+  HomeIcon,
+  AskFredIcon,
+  MeetingsIcon,
+  TasksIcon,
+  IntegrationsIcon,
+  AnalyticsIcon,
+  VoiceAgentsIcon,
+  AISkillsIcon,
+  UpgradeIcon,
+  SettingsIcon,
+} from "./custom-icons";
 
 const nav = [
-  { label: "Home", href: "/", icon: Home },
-  { label: "AskFred", href: "/ask-fred", icon: Bot, shortcut: "Ctrl + J" },
-  { label: "Meetings", href: "/meetings", icon: Video },
-  { label: "Meeting Status", href: "/status", icon: Activity },
-  { label: "Uploads", href: "/meetings?upload=1", icon: Upload },
-  { label: "Integrations", href: "/integrations", icon: Layers3 },
-  { label: "Analytics", href: "/analytics", icon: BarChart3 },
-  { label: "Voice Agents", href: "/voice-agents", icon: WandSparkles, badge: "NEW" },
-  { label: "AI Skills", href: "/ai-skills", icon: Sparkles },
+  { label: "Home", href: "/", icon: HomeIcon },
+  { label: "AskFred", href: "/ask-fred", icon: AskFredIcon, shortcut: "Ctrl + J" },
+  { label: "Meetings", href: "/notebook/mine-shared", icon: MeetingsIcon },
+  { label: "Tasks", href: "/welcome/tasks", icon: TasksIcon },
+  { label: "AI Skills", href: "/skills", icon: AISkillsIcon },
+  { label: "Analytics", href: "/analytics", icon: AnalyticsIcon },
+  { label: "Voice Agents", href: "/agents", icon: VoiceAgentsIcon, badge: "NEW" },
+  { label: "Upgrade", href: "/upgrade", icon: UpgradeIcon, badge: "40% OFF" },
 ];
 
 type ShellActions = {
@@ -115,7 +115,7 @@ export function AppShell({
 
   function submitSearch(event: FormEvent) {
     event.preventDefault();
-    if (search.trim()) router.push(`/meetings?q=${encodeURIComponent(search.trim())}`);
+    if (search.trim()) router.push(`/notebook/mine-shared?q=${encodeURIComponent(search.trim())}`);
   }
 
   function submitCapture(event: FormEvent) {
@@ -125,7 +125,7 @@ export function AppShell({
     const params = new URLSearchParams({ capture: "1", link, language: meetingLanguage });
     if (meetingName.trim()) params.set("name", meetingName.trim());
     setDialog(null);
-    router.push(`/meetings?${params.toString()}`);
+    router.push(`/notebook/mine-shared?${params.toString()}`);
   }
 
   const openCapture = () => {
@@ -152,49 +152,73 @@ export function AppShell({
 
         <aside className={`icon-rail ${mobileOpen ? "open" : ""}`}>
           <div className="rail-brand-row">
-            <Link href="/" className="rail-logo" aria-label="Home">
-              <FirefliesMark size={24} />
-              <span className="rail-wordmark">fireflies.ai</span>
-            </Link>
+            {railExpanded ? (
+              <Link href="/" className="rail-logo" aria-label="Home">
+                <FirefliesMark size={24} />
+                <span className="rail-wordmark">fireflies.ai</span>
+              </Link>
+            ) : (
+              <button className="avatar-button" onClick={() => setProfileOpen((value) => !value)} aria-label="Profile" aria-expanded={profileOpen} style={{ width: 28, height: 28, fontSize: 12 }}>AT</button>
+            )}
             <button className="rail-toggle" onClick={() => setRailExpanded((value) => !value)} aria-label={railExpanded ? "Collapse sidebar" : "Expand sidebar"}>
               {railExpanded ? <ChevronLeft size={17} /> : <ChevronRight size={17} />}
             </button>
           </div>
 
+          {railExpanded && (
+            <div className="rail-profile-expanded" style={{ padding: "0 16px 12px", borderBottom: "1px solid var(--border)", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
+              <button className="avatar-button" onClick={() => setProfileOpen((value) => !value)} aria-label="Profile" aria-expanded={profileOpen} style={{ width: 28, height: 28, fontSize: 12 }}>AT</button>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <span style={{ fontSize: 13, fontWeight: 500, color: "var(--ink)" }}>Aryan Tyagi</span>
+                <span style={{ fontSize: 11, color: "var(--muted)" }}>Free Plan</span>
+              </div>
+            </div>
+          )}
+
           <nav className="rail-nav">
             {nav.map(({ label, href, icon: Icon, shortcut, badge }, index) => {
               const active = href === "/" ? pathname === "/" : pathname.startsWith(href.split("?")[0]);
-              const outOfScope = ["/status", "/integrations", "/analytics", "/voice-agents", "/ai-skills"].includes(href);
+              const outOfScope = ["/welcome/tasks", "/skills", "/analytics", "/agents", "/upgrade", "/integrations", "/status"].includes(href);
               
               if (outOfScope) {
                 return (
                   <button key={label} onClick={() => showToast("Feature coming soon!")} className={`rail-link ${active ? "active" : ""}`} aria-label={label} title={railExpanded ? undefined : label}>
-                    {index === 1 ? <FredMark size={18} /> : <Icon size={18} strokeWidth={1.65} />}
+                    <Icon width={20} height={20} />
                     <span className="rail-label">{label}</span>
                     {shortcut && <kbd>{shortcut}</kbd>}
-                    {badge && <i className="rail-badge">{badge}</i>}
+                    {badge && label === "Upgrade" && railExpanded ? (
+                      <span className="rail-badge" style={{ background: "#e2fbe8", color: "#008a2e", padding: "0 6px", border: "1px solid #bdf1c9", fontSize: "10px", marginLeft: "auto", borderRadius: "10px", fontWeight: 600 }}>{badge}</span>
+                    ) : badge && railExpanded ? (
+                      <i className="rail-badge">{badge}</i>
+                    ) : null}
                   </button>
                 );
               }
 
               return (
-                <Link key={label} href={href} prefetch={false} className={`rail-link ${active ? "active" : ""}`} aria-label={label} title={railExpanded ? undefined : label}>
-                  {index === 1 ? <FredMark size={18} /> : <Icon size={18} strokeWidth={1.65} />}
+                <Link key={label} href={href} className={`rail-link ${active ? "active" : ""}`} aria-label={label} title={railExpanded ? undefined : label}>
+                  <Icon width={20} height={20} />
                   <span className="rail-label">{label}</span>
                   {shortcut && <kbd>{shortcut}</kbd>}
-                  {badge && <i className="rail-badge">{badge}</i>}
+                  {badge && label === "Upgrade" && railExpanded ? (
+                    <span className="rail-badge" style={{ background: "#e2fbe8", color: "#008a2e", padding: "0 6px", border: "1px solid #bdf1c9", fontSize: "10px", marginLeft: "auto", borderRadius: "10px", fontWeight: 600 }}>{badge}</span>
+                  ) : badge && railExpanded ? (
+                    <i className="rail-badge">{badge}</i>
+                  ) : null}
                 </Link>
               );
             })}
           </nav>
 
           <div className="rail-bottom">
-            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Team"><Users size={18} /><span className="rail-label">Team</span></button>
-            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Upgrade"><Zap size={18} /><span className="rail-label">Upgrade</span></button>
-            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Settings"><Settings size={18} /><span className="rail-label">Settings</span></button>
-            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="More"><span className="more-dots">•••</span><span className="rail-label">More</span></button>
-            <div style={{ flexGrow: 1, minHeight: "16px" }} />
-            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Privacy"><Lock size={18} /><span className="rail-label">Your Privacy Choices</span></button>
+            <button onClick={() => showToast("Feature coming soon!")} className={`rail-link ${pathname.startsWith("/integrations") ? "active" : ""}`} aria-label="Integrations" title={railExpanded ? undefined : "Integrations"}>
+              <IntegrationsIcon width={20} height={20} />
+              <span className="rail-label">Integrations</span>
+            </button>
+            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Settings">
+              <SettingsIcon width={20} height={20} />
+              <span className="rail-label">Settings</span>
+            </button>
           </div>
         </aside>
 
@@ -213,13 +237,11 @@ export function AppShell({
           </form>
           <div className="top-actions">
             <button className="upgrade-button" onClick={() => showToast("Feature coming soon!")}>Upgrade</button>
+            <button className="icon-button top-icon notification" aria-label="Notifications"><Bell size={19} /><i /></button>
             <div className="capture-group">
               <button className="capture-button" onClick={openCapture}><Video size={17} /><span>Capture</span></button>
               <button className="capture-more" onClick={openCapture} aria-label="Capture options"><ChevronDown size={15} /></button>
             </div>
-            <button className="icon-button top-icon" aria-label="Voice input"><Mic size={19} /></button>
-            <button className="icon-button top-icon notification" aria-label="Notifications"><Bell size={19} /><i /></button>
-            <button className="avatar-button" onClick={() => setProfileOpen((value) => !value)} aria-label="Profile" aria-expanded={profileOpen}>AT</button>
           </div>
         </header>
 
@@ -297,9 +319,9 @@ export function MeetingsNav() {
       <div className="secondary-title"><span>Meetings</span></div>
       <div className="channel-search"><Search size={16} /><input placeholder="Search channels" /></div>
       <nav className="secondary-links">
-        <Link className="active" href="/meetings"><span>#</span> My Meetings</Link>
-        <Link href="/meetings"><MonitorUp size={17} /> All Meetings</Link>
-        <Link href="/meetings"><Bot size={17} /> Voice Agent Meetings</Link>
+        <Link className="active" href="/notebook/mine-shared"><span>#</span> My Meetings</Link>
+        <Link href="/notebook/mine-shared"><MonitorUp size={17} /> All Meetings</Link>
+        <Link href="/notebook/mine-shared"><Bot size={17} /> Voice Agent Meetings</Link>
       </nav>
       <div className="channels-box">
         <p>All channels</p>

@@ -119,7 +119,7 @@ export function MeetingDetailView({ id }: { id: number }) {
 
   async function deleteMeeting() {
     if (!window.confirm("Delete this meeting and all its contents?")) return;
-    try { await api.deleteMeeting(id); showToast("Meeting deleted"); router.push("/meetings"); } catch { showToast("Could not delete meeting"); }
+    try { await api.deleteMeeting(id); showToast("Meeting deleted"); router.push("/notebook/mine-shared"); } catch { showToast("Could not delete meeting"); }
   }
 
   function ask(event: FormEvent) {

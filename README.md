@@ -32,12 +32,18 @@ npm run dev
 
 Open `http://localhost:3000`. API docs: `http://localhost:8000/docs`.
 
+## Features & UI Parity
+
+- **Pixel-Perfect UI**: Fully refactored App Shell, Sidebars, and Home view to precisely match the latest Fireflies.ai styling (custom gradients, interactive micro-animations, and modern SVG iconography).
+- **Responsive Layout**: Adapts gracefully across Desktop and Mobile form factors.
+- **Full Backend Integration**: REST APIs for meetings, transcripts, summaries, action items, and TXT/Markdown/PDF exports.
+
 ## Routes
 
-- `/` Home and quick start
-- `/meetings` meeting library, search, transcript upload
-- `/meeting/1` transcript, summary, action items, exports, AskFred panel
-- `/ask-fred` standalone AskFred experience
+- `/` Home and quick start dashboard
+- `/notebook/mine-shared` Meeting library, search, and transcript uploads
+- `/meeting/[id]` Interactive transcript, playback controls, summary, action items, exports, and AskFred panel
+- `/ask-fred` Standalone AskFred chat experience
 
 ## Verification
 

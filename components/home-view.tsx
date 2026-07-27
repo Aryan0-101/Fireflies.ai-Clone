@@ -39,7 +39,7 @@ export function HomeView() {
         <p>Capture your first meeting or upload a recording to see Fireflies in action.</p>
         <div className="quick-start">
           <button type="button" onClick={openSchedule} className="quick pink" aria-label="Schedule Meeting"><CalendarDays size={20} /><span>Schedule Meeting</span><ChevronRight size={16} /></button>
-          <Link href="/meetings?upload=1" className="quick mint" aria-label="Upload File"><Upload size={20} /><span>Upload File</span><ChevronRight size={16} /></Link>
+          <Link href="/notebook/mine-shared?upload=1" className="quick mint" aria-label="Upload File"><Upload size={20} /><span>Upload File</span><ChevronRight size={16} /></Link>
           <button type="button" onClick={openCapture} className="quick lavender" aria-label="Capture Meeting"><Plus size={20} /><span>Capture Meeting</span><ChevronRight size={16} /></button>
         </div>
       </section>
