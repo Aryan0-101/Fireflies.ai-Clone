@@ -11,7 +11,8 @@ verification/
 .env
 .env.local
 clone.png
-original.png
+original.css
+original.html
 cookies.json
 app.fireflies.ai/
 reference_capture/

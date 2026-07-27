@@ -127,7 +127,7 @@ export function MeetingsView() {
     setActiveDropdown(null);
   }
 
-'  const filteredMeetings = useMemo(() => {
+  const filteredMeetings = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     const normalizedParticipant = filterParticipant.trim().toLowerCase();
     return meetings.filter((m) => {
@@ -146,7 +146,7 @@ export function MeetingsView() {
       if (sortBy === "title") return a.title.localeCompare(b.title);
       return new Date(b.meeting_date).getTime() - new Date(a.meeting_date).getTime();
     });
-  }, [meetings, query, filterStatus, filterParticipant, filterFrom, filterTo, sortBy]);'
+  }, [meetings, query, filterStatus, filterParticipant, filterFrom, filterTo, sortBy]);
 
   return (
     <div className="meetings-page">

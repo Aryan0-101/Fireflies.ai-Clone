@@ -169,7 +169,7 @@ export function AppShell({
               if (outOfScope) {
                 return (
                   <button key={label} onClick={() => showToast("Feature coming soon!")} className={`rail-link ${active ? "active" : ""}`} aria-label={label} title={railExpanded ? undefined : label}>
-                    {index === 1 ? <FredMark size={20} /> : <Icon size={20} strokeWidth={1.65} />}
+                    {index === 1 ? <FredMark size={18} /> : <Icon size={18} strokeWidth={1.65} />}
                     <span className="rail-label">{label}</span>
                     {shortcut && <kbd>{shortcut}</kbd>}
                     {badge && <i className="rail-badge">{badge}</i>}
@@ -179,7 +179,7 @@ export function AppShell({
 
               return (
                 <Link key={label} href={href} prefetch={false} className={`rail-link ${active ? "active" : ""}`} aria-label={label} title={railExpanded ? undefined : label}>
-                  {index === 1 ? <FredMark size={20} /> : <Icon size={20} strokeWidth={1.65} />}
+                  {index === 1 ? <FredMark size={18} /> : <Icon size={18} strokeWidth={1.65} />}
                   <span className="rail-label">{label}</span>
                   {shortcut && <kbd>{shortcut}</kbd>}
                   {badge && <i className="rail-badge">{badge}</i>}
@@ -189,12 +189,12 @@ export function AppShell({
           </nav>
 
           <div className="rail-bottom">
-            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Team"><Users size={20} /><span className="rail-label">Team</span></button>
-            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Upgrade"><Zap size={20} /><span className="rail-label">Upgrade</span></button>
-            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Settings"><Settings size={20} /><span className="rail-label">Settings</span></button>
+            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Team"><Users size={18} /><span className="rail-label">Team</span></button>
+            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Upgrade"><Zap size={18} /><span className="rail-label">Upgrade</span></button>
+            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Settings"><Settings size={18} /><span className="rail-label">Settings</span></button>
             <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="More"><span className="more-dots">•••</span><span className="rail-label">More</span></button>
             <div style={{ flexGrow: 1, minHeight: "16px" }} />
-            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Privacy"><Lock size={20} /><span className="rail-label">Your Privacy Choices</span></button>
+            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Privacy"><Lock size={18} /><span className="rail-label">Your Privacy Choices</span></button>
           </div>
         </aside>
 
