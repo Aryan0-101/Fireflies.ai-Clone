@@ -3,8 +3,8 @@
 This is a full-stack meeting intelligence app built to match the current Fireflies.ai product UI. This project was developed as a task for **Scaler**.
 
 ## Links
-- **Frontend Deployment**: [Insert Cloudflare URL here]
-- **Backend API**: [Insert Render URL here]
+- **Frontend Deployment**: https://fireflies-ai-clone.pages.dev
+- **Backend API**: Render
 
 ## Stack
 
