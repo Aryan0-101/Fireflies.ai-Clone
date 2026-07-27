@@ -1,6 +1,6 @@
 "use client";
 
-import { Apple, CalendarDays, ChevronRight, Download, Monitor, Play, Smartphone, Upload, Video } from "lucide-react";
+import { Apple, CalendarDays, ChevronRight, Download, Monitor, Play, Smartphone, Upload, Video, Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
@@ -17,7 +17,7 @@ function formatDate(value: string) {
 
 export function HomeView() {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
-  const { openCapture, openSchedule } = useShellActions();
+  const { openCapture, openSchedule, showToast } = useShellActions();
   useEffect(() => { api.meetings().then((data) => setMeetings(data.items.slice(0, 3))).catch(() => undefined); }, []);
 
   return (
@@ -40,13 +40,13 @@ export function HomeView() {
         <div className="quick-start">
           <button type="button" onClick={openSchedule} className="quick pink" aria-label="Schedule Meeting"><CalendarDays size={20} /><span>Schedule Meeting</span><ChevronRight size={16} /></button>
           <Link href="/meetings?upload=1" className="quick mint" aria-label="Upload File"><Upload size={20} /><span>Upload File</span><ChevronRight size={16} /></Link>
-          <button type="button" onClick={openCapture} className="quick lavender" aria-label="Capture Meeting"><Video size={20} /><span>Capture Meeting</span><ChevronRight size={16} /></button>
+          <button type="button" onClick={openCapture} className="quick lavender" aria-label="Capture Meeting"><Plus size={20} /><span>Capture Meeting</span><ChevronRight size={16} /></button>
         </div>
       </section>
 
       <section className="recent-section">
-        <div className="recent-tabs"><button className="active">Recent</button><button>Upcoming</button><button>AI Feed</button></div>
-        <button className="settings-link"><CalendarDays size={16} /> Settings</button>
+        <div className="recent-tabs"><button className="active">Recent</button><button onClick={() => showToast("Feature coming soon!")}>Upcoming</button><button onClick={() => showToast("Feature coming soon!")}>AI Feed</button></div>
+        <button className="settings-link" onClick={() => showToast("Feature coming soon!")}><CalendarDays size={16} /> Settings</button>
         <div className="recent-list">
           {meetings.length ? meetings.map((meeting) => (
             <Link href={`/meeting/${meeting.id}`} key={meeting.id} className="recent-row">
@@ -64,15 +64,15 @@ export function HomeView() {
             <Monitor size={23} />
             <h3>Desktop App</h3>
             <p>Capture conversations without any bot present in your meeting.</p>
-            <button className="purple-button"><Download size={16} /> Download</button>
+            <button className="purple-button" onClick={() => showToast("Feature coming soon!")}><Download size={16} /> Download</button>
           </article>
           <article>
             <Smartphone size={23} />
             <h3>Mobile App</h3>
             <p>Record in-person conversations and review meetings on the go.</p>
             <div className="store-buttons">
-              <button aria-label="Get Fireflies iOS app" title="App Store"><Apple size={18} fill="currentColor" /></button>
-              <button aria-label="Get Fireflies Android app" title="Google Play"><Play size={17} fill="currentColor" /></button>
+              <button onClick={() => showToast("Feature coming soon!")} aria-label="Get Fireflies iOS app" title="App Store"><Apple size={18} fill="currentColor" /></button>
+              <button onClick={() => showToast("Feature coming soon!")} aria-label="Get Fireflies Android app" title="Google Play"><Play size={17} fill="currentColor" /></button>
             </div>
           </article>
         </div>

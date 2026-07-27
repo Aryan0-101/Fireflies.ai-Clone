@@ -3,8 +3,9 @@
 import {
   Bot, CalendarDays, Check, CheckSquare, ChevronRight, CircleHelp, Clock3, Download,
   Expand, Link2, ListChecks, Play, Search, Send, Share2, Sparkles, WandSparkles,
+  Plus, Edit, Trash2, X,
 } from "lucide-react";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState, MouseEvent } from "react";
 import { API_URL, api } from "@/lib/api";
 import type { Meeting, Segment } from "@/lib/types";
 
@@ -19,6 +20,14 @@ export function MeetingDetailView({ id }: { id: number }) {
   const [query, setQuery] = useState("");
   const [chat, setChat] = useState<string[]>([]);
   const [prompt, setPrompt] = useState("");
+  
+  // Action Item CRUD state
+  const [newActionText, setNewActionText] = useState("");
+  const [editingActionId, setEditingActionId] = useState<number | null>(null);
+  const [editingActionText, setEditingActionText] = useState("");
+  
+  // Summary loading state
+  const [summarizing, setSummarizing] = useState(false);
 
   useEffect(() => { api.meeting(id).then(setMeeting); }, [id]);
   const segments = useMemo(() => (meeting?.transcript_segments ?? []).filter((segment) => segment.text.toLowerCase().includes(query.toLowerCase())), [meeting, query]);
@@ -26,6 +35,40 @@ export function MeetingDetailView({ id }: { id: number }) {
   async function toggleAction(actionId: number, completed: boolean) {
     await api.toggleAction(actionId, !completed);
     setMeeting(await api.meeting(id));
+  }
+
+  async function handleAddAction(e: FormEvent) {
+    e.preventDefault();
+    if (!newActionText.trim()) return;
+    await api.createAction({ meeting_id: id, description: newActionText.trim() });
+    setNewActionText("");
+    setMeeting(await api.meeting(id));
+  }
+
+  async function handleUpdateAction(e: FormEvent) {
+    e.preventDefault();
+    if (!editingActionId || !editingActionText.trim()) return;
+    await api.updateAction(editingActionId, { description: editingActionText.trim() });
+    setEditingActionId(null);
+    setEditingActionText("");
+    setMeeting(await api.meeting(id));
+  }
+
+  async function handleDeleteAction(actionId: number, e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    await api.deleteAction(actionId);
+    setMeeting(await api.meeting(id));
+  }
+
+  async function handleSummarize() {
+    setSummarizing(true);
+    try {
+      await api.generateSummary(id);
+      setMeeting(await api.meeting(id));
+    } finally {
+      setSummarizing(false);
+    }
   }
 
   function ask(event: FormEvent) {
@@ -69,15 +112,38 @@ export function MeetingDetailView({ id }: { id: number }) {
           <div className="quick-actions-panel">
             <h2><Sparkles size={21} /> Quick Actions</h2>
             <div className="detail-quick-grid">
-              <button><i><ListChecks size={17} /></i><strong>Summarize</strong><small>Generate quick brief</small></button>
+              <button onClick={handleSummarize} disabled={summarizing}><i><ListChecks size={17} /></i><strong>{summarizing ? "Summarizing..." : "Summarize"}</strong><small>Generate quick brief</small></button>
               <button><i className="teal"><CheckSquare size={17} /></i><strong>Action Items</strong><small>Extract tasks</small></button>
               <button><i className="pink"><Clock3 size={17} /></i><strong>Catch Up</strong><small>Missed the start?</small></button>
               <button><i className="gray"><CircleHelp size={17} /></i><strong>Suggest Qs</strong><small>What to ask next</small></button>
             </div>
-            <div className="summary-block"><span>Summary</span><p>{meeting.summary?.summary}</p></div>
+            <div className="summary-block"><span>Summary</span><p>{meeting.summary?.summary || "No summary available."}</p></div>
             <div className="action-list">
               <span>Action Items</span>
-              {meeting.action_items?.map((item) => <button key={item.id} className={item.completed ? "done" : ""} onClick={() => toggleAction(item.id, item.completed)}><i>{item.completed && <Check size={13} />}</i><span>{item.description}<small>{item.assignee}</small></span></button>)}
+              <form onSubmit={handleAddAction} className="add-action-form">
+                <input value={newActionText} onChange={e => setNewActionText(e.target.value)} placeholder="Add a new action item..." />
+                <button type="submit"><Plus size={16} /></button>
+              </form>
+              {meeting.action_items?.map((item) => (
+                <div key={item.id} className={`action-item-row ${item.completed ? "done" : ""}`}>
+                  <button className="check-btn" onClick={() => toggleAction(item.id, item.completed)}><i>{item.completed && <Check size={13} />}</i></button>
+                  {editingActionId === item.id ? (
+                    <form onSubmit={handleUpdateAction} className="edit-action-form" style={{ flex: 1, display: "flex", gap: "4px" }}>
+                      <input autoFocus value={editingActionText} onChange={e => setEditingActionText(e.target.value)} />
+                      <button type="button" onClick={() => setEditingActionId(null)} className="icon-button"><X size={14} /></button>
+                      <button type="submit" className="icon-button"><Check size={14} /></button>
+                    </form>
+                  ) : (
+                    <>
+                      <span className="action-text" onClick={() => { setEditingActionId(item.id); setEditingActionText(item.description); }}>{item.description}<small>{item.assignee}</small></span>
+                      <div className="action-actions">
+                        <button onClick={(e) => { e.stopPropagation(); setEditingActionId(item.id); setEditingActionText(item.description); }} className="icon-button"><Edit size={14} /></button>
+                        <button onClick={(e) => handleDeleteAction(item.id, e)} className="icon-button danger"><Trash2 size={14} /></button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </section>

@@ -42,8 +42,17 @@ class MeetingService:
 
     def update(self, meeting_id: int, payload: MeetingUpdate) -> Meeting:
         meeting = self.get(meeting_id)
-        for field, value in payload.model_dump(exclude_unset=True).items():
+        values = payload.model_dump(exclude_unset=True)
+        participants = values.pop("participants", None)
+        for field, value in values.items():
             setattr(meeting, field, value)
+        if participants is not None:
+            meeting.participants.clear()
+            for email in participants:
+                participant = self.db.scalar(select(Participant).where(Participant.email == email))
+                if not participant:
+                    participant = Participant(name=email.split("@")[0].replace(".", " ").title(), email=email)
+                meeting.participants.append(participant)
         meeting.updated_at = datetime.now(timezone.utc)
         self.db.commit()
         return self.get(meeting_id)

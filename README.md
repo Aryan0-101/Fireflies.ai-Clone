@@ -1,6 +1,6 @@
-# Fireflies.ai Clone
+# Fireflies.ai Clone - Scaler Task
 
-Full-stack meeting intelligence app matching current Fireflies.ai product UI.
+This is a full-stack meeting intelligence app built to match the current Fireflies.ai product UI. This project was developed as a task for **Scaler**.
 
 ## Stack
 
@@ -44,5 +44,3 @@ cd ..
 npm run build
 python tools/verify_local.py
 ```
-
-Live Fireflies captures in `reference_capture/` are primary design references. Stitch files only fill missing meeting-detail content states.

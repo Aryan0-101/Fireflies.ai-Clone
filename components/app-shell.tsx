@@ -31,6 +31,8 @@ import {
   WandSparkles,
   X,
   Zap,
+  Info,
+  Lock,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -52,6 +54,7 @@ const nav = [
 type ShellActions = {
   openCapture: () => void;
   openSchedule: () => void;
+  showToast: (message: string) => void;
 };
 
 const ShellActionsContext = createContext<ShellActions | null>(null);
@@ -86,6 +89,12 @@ export function AppShell({
   const [meetingName, setMeetingName] = useState("");
   const [meetingLink, setMeetingLink] = useState("");
   const [meetingLanguage, setMeetingLanguage] = useState("English (Global)");
+  const [toast, setToast] = useState<string | null>(null);
+
+  const showToast = (message: string) => {
+    setToast(message);
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     setMobileOpen(false);
@@ -129,7 +138,7 @@ export function AppShell({
   };
 
   return (
-    <ShellActionsContext.Provider value={{ openCapture, openSchedule }}>
+    <ShellActionsContext.Provider value={{ openCapture, openSchedule, showToast }}>
       <div className={`app-frame ${bannerOpen ? "has-banner" : ""} ${railExpanded ? "rail-expanded" : ""}`}>
         {bannerOpen && (
           <div className="trial-banner">
@@ -155,6 +164,19 @@ export function AppShell({
           <nav className="rail-nav">
             {nav.map(({ label, href, icon: Icon, shortcut, badge }, index) => {
               const active = href === "/" ? pathname === "/" : pathname.startsWith(href.split("?")[0]);
+              const outOfScope = ["/status", "/integrations", "/analytics", "/voice-agents", "/ai-skills"].includes(href);
+              
+              if (outOfScope) {
+                return (
+                  <button key={label} onClick={() => showToast("Feature coming soon!")} className={`rail-link ${active ? "active" : ""}`} aria-label={label} title={railExpanded ? undefined : label}>
+                    {index === 1 ? <FredMark size={20} /> : <Icon size={20} strokeWidth={1.65} />}
+                    <span className="rail-label">{label}</span>
+                    {shortcut && <kbd>{shortcut}</kbd>}
+                    {badge && <i className="rail-badge">{badge}</i>}
+                  </button>
+                );
+              }
+
               return (
                 <Link key={label} href={href} prefetch={false} className={`rail-link ${active ? "active" : ""}`} aria-label={label} title={railExpanded ? undefined : label}>
                   {index === 1 ? <FredMark size={20} /> : <Icon size={20} strokeWidth={1.65} />}
@@ -167,10 +189,12 @@ export function AppShell({
           </nav>
 
           <div className="rail-bottom">
-            <Link href="/team" prefetch={false} className="rail-link" aria-label="Team"><Users size={20} /><span className="rail-label">Team</span></Link>
-            <button className="rail-link" aria-label="Upgrade"><Zap size={20} /><span className="rail-label">Upgrade</span></button>
-            <Link href="/settings" prefetch={false} className="rail-link" aria-label="Settings"><Settings size={20} /><span className="rail-label">Settings</span></Link>
-            <button className="rail-link" aria-label="More"><span className="more-dots">•••</span><span className="rail-label">More</span></button>
+            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Team"><Users size={20} /><span className="rail-label">Team</span></button>
+            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Upgrade"><Zap size={20} /><span className="rail-label">Upgrade</span></button>
+            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Settings"><Settings size={20} /><span className="rail-label">Settings</span></button>
+            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="More"><span className="more-dots">•••</span><span className="rail-label">More</span></button>
+            <div style={{ flexGrow: 1, minHeight: "16px" }} />
+            <button onClick={() => showToast("Feature coming soon!")} className="rail-link" aria-label="Privacy"><Lock size={20} /><span className="rail-label">Your Privacy Choices</span></button>
           </div>
         </aside>
 
@@ -188,7 +212,7 @@ export function AppShell({
             <kbd>Ctrl + K</kbd>
           </form>
           <div className="top-actions">
-            <button className="upgrade-button">Upgrade</button>
+            <button className="upgrade-button" onClick={() => showToast("Feature coming soon!")}>Upgrade</button>
             <div className="capture-group">
               <button className="capture-button" onClick={openCapture}><Video size={17} /><span>Capture</span></button>
               <button className="capture-more" onClick={openCapture} aria-label="Capture options"><ChevronDown size={15} /></button>
@@ -208,17 +232,17 @@ export function AppShell({
                 <div className="plan-row"><span>Free</span><strong>Unlimited meetings</strong></div>
                 <div className="storage-row"><span>Storage</span><small>0 / 400 mins</small><i><b /></i></div>
                 <nav>
-                  <Link href="/referrals" prefetch={false}><Gift size={17} /> Refer and Earn $5</Link>
-                  <Link href="/settings" prefetch={false}><Settings size={17} /> Settings</Link>
-                  <Link href="/devices" prefetch={false}><Laptop size={17} /> Manage Devices</Link>
-                  <Link href="/platform-rules" prefetch={false}><ShieldCheck size={17} /> Platform Rules</Link>
-                  <button><LogOut size={17} /> Logout</button>
+                  <button onClick={() => showToast("Feature coming soon!")}><Gift size={17} /> Refer and Earn $5</button>
+                  <button onClick={() => showToast("Feature coming soon!")}><Settings size={17} /> Settings</button>
+                  <button onClick={() => showToast("Feature coming soon!")}><Laptop size={17} /> Manage Devices</button>
+                  <button onClick={() => showToast("Feature coming soon!")}><ShieldCheck size={17} /> Platform Rules</button>
+                  <button onClick={() => showToast("Feature coming soon!")}><LogOut size={17} /> Logout</button>
                 </nav>
               </section>
               <section className="profile-apps">
                 <article><div><UserRound size={18} /><span><strong>Mobile App</strong><small>Transcribe and summarize in-person conversations with mobile app.</small></span></div></article>
-                <article><div><ExternalLink size={18} /><span><strong>Chrome Extension</strong><small>Record and transcribe Google Meet calls without Fireflies notetaker bot.</small></span></div><button>Install</button></article>
-                <button className="desktop-download"><Laptop size={17} /> Download Fireflies Desktop App</button>
+                <article><div><ExternalLink size={18} /><span><strong>Chrome Extension</strong><small>Record and transcribe Google Meet calls without Fireflies notetaker bot.</small></span></div><button onClick={() => showToast("Feature coming soon!")}>Install</button></article>
+                <button className="desktop-download" onClick={() => showToast("Feature coming soon!")}><Laptop size={17} /> Download Fireflies Desktop App</button>
               </section>
             </div>
           </>
@@ -253,6 +277,13 @@ export function AppShell({
               <label>Meeting language<select value={meetingLanguage} onChange={(event) => setMeetingLanguage(event.target.value)}><option>English (Global)</option><option>English (US)</option><option>English (UK)</option><option>Hindi</option><option>Spanish</option></select></label>
               <div className="modal-actions"><button type="button" className="secondary-button" onClick={() => setDialog(null)}>Cancel</button><button type="submit" className="primary-button">Start Capturing</button></div>
             </form>
+          </div>
+        )}
+
+        {toast && (
+          <div className="toast-message">
+            <Info size={16} />
+            <span>{toast}</span>
           </div>
         )}
       </div>

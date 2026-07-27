@@ -30,6 +30,8 @@ export type Meeting = {
   summary?: Summary | null;
   action_items?: ActionItem[];
 };
+export type MeetingCreate = { title: string; description?: string; meeting_date: string; duration_seconds?: number; participants?: string[] };
+export type MeetingUpdate = { title?: string; description?: string; meeting_date?: string; duration_seconds?: number; status?: string; participants?: string[] };
 export type MeetingPage = {
   items: Meeting[];
   total: number;

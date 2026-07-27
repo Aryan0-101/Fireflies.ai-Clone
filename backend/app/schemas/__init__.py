@@ -24,6 +24,7 @@ class MeetingUpdate(BaseModel):
     meeting_date: datetime | None = None
     duration_seconds: int | None = Field(default=None, ge=0)
     status: str | None = None
+    participants: list[str] | None = None
 
 
 class SegmentOut(BaseModel):

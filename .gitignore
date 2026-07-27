@@ -8,3 +8,10 @@ backend/**/__pycache__/
 backend/.pytest_cache/
 *.log
 verification/
+.env
+.env.local
+clone.png
+original.png
+cookies.json
+app.fireflies.ai/
+reference_capture/
