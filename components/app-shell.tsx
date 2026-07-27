@@ -1,0 +1,299 @@
+"use client";
+
+import {
+  Activity,
+  BarChart3,
+  Bell,
+  Bot,
+  CalendarDays,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  CircleHelp,
+  ExternalLink,
+  Gift,
+  Home,
+  Laptop,
+  Layers3,
+  LogOut,
+  Menu,
+  Mic,
+  MonitorUp,
+  Search,
+  Settings,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Upload,
+  UserRound,
+  Users,
+  Video,
+  WandSparkles,
+  X,
+  Zap,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { createContext, FormEvent, ReactNode, useContext, useEffect, useState } from "react";
+import { FirefliesMark, FredMark } from "./brand";
+
+const nav = [
+  { label: "Home", href: "/", icon: Home },
+  { label: "AskFred", href: "/ask-fred", icon: Bot, shortcut: "Ctrl + J" },
+  { label: "Meetings", href: "/meetings", icon: Video },
+  { label: "Meeting Status", href: "/status", icon: Activity },
+  { label: "Uploads", href: "/meetings?upload=1", icon: Upload },
+  { label: "Integrations", href: "/integrations", icon: Layers3 },
+  { label: "Analytics", href: "/analytics", icon: BarChart3 },
+  { label: "Voice Agents", href: "/voice-agents", icon: WandSparkles, badge: "NEW" },
+  { label: "AI Skills", href: "/ai-skills", icon: Sparkles },
+];
+
+type ShellActions = {
+  openCapture: () => void;
+  openSchedule: () => void;
+};
+
+const ShellActionsContext = createContext<ShellActions | null>(null);
+
+export function useShellActions() {
+  const value = useContext(ShellActionsContext);
+  if (!value) throw new Error("useShellActions must be used inside AppShell");
+  return value;
+}
+
+type DialogName = "capture" | "schedule" | null;
+
+export function AppShell({
+  title,
+  children,
+  secondary,
+  banner = true,
+}: {
+  title: string;
+  children: ReactNode;
+  secondary?: ReactNode;
+  banner?: boolean;
+}) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [railExpanded, setRailExpanded] = useState(false);
+  const [bannerOpen, setBannerOpen] = useState(banner);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [dialog, setDialog] = useState<DialogName>(null);
+  const [search, setSearch] = useState("");
+  const [meetingName, setMeetingName] = useState("");
+  const [meetingLink, setMeetingLink] = useState("");
+  const [meetingLanguage, setMeetingLanguage] = useState("English (Global)");
+
+  useEffect(() => {
+    setMobileOpen(false);
+    setProfileOpen(false);
+    setDialog(null);
+  }, [pathname]);
+
+  useEffect(() => {
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setProfileOpen(false);
+        setDialog(null);
+      }
+    }
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, []);
+
+  function submitSearch(event: FormEvent) {
+    event.preventDefault();
+    if (search.trim()) router.push(`/meetings?q=${encodeURIComponent(search.trim())}`);
+  }
+
+  function submitCapture(event: FormEvent) {
+    event.preventDefault();
+    const link = meetingLink.trim();
+    if (!link) return;
+    const params = new URLSearchParams({ capture: "1", link, language: meetingLanguage });
+    if (meetingName.trim()) params.set("name", meetingName.trim());
+    setDialog(null);
+    router.push(`/meetings?${params.toString()}`);
+  }
+
+  const openCapture = () => {
+    setProfileOpen(false);
+    setDialog("capture");
+  };
+  const openSchedule = () => {
+    setProfileOpen(false);
+    setDialog("schedule");
+  };
+
+  return (
+    <ShellActionsContext.Provider value={{ openCapture, openSchedule }}>
+      <div className={`app-frame ${bannerOpen ? "has-banner" : ""} ${railExpanded ? "rail-expanded" : ""}`}>
+        {bannerOpen && (
+          <div className="trial-banner">
+            <span>You are eligible for 7 days business plan free trial.</span>
+            <button>Start free trial <span aria-hidden>→</span></button>
+            <button className="banner-close icon-button" onClick={() => setBannerOpen(false)} aria-label="Dismiss banner">
+              <X size={16} />
+            </button>
+          </div>
+        )}
+
+        <aside className={`icon-rail ${mobileOpen ? "open" : ""}`}>
+          <div className="rail-brand-row">
+            <Link href="/" className="rail-logo" aria-label="Home">
+              <FirefliesMark size={24} />
+              <span className="rail-wordmark">fireflies.ai</span>
+            </Link>
+            <button className="rail-toggle" onClick={() => setRailExpanded((value) => !value)} aria-label={railExpanded ? "Collapse sidebar" : "Expand sidebar"}>
+              {railExpanded ? <ChevronLeft size={17} /> : <ChevronRight size={17} />}
+            </button>
+          </div>
+
+          <nav className="rail-nav">
+            {nav.map(({ label, href, icon: Icon, shortcut, badge }, index) => {
+              const active = href === "/" ? pathname === "/" : pathname.startsWith(href.split("?")[0]);
+              return (
+                <Link key={label} href={href} prefetch={false} className={`rail-link ${active ? "active" : ""}`} aria-label={label} title={railExpanded ? undefined : label}>
+                  {index === 1 ? <FredMark size={20} /> : <Icon size={20} strokeWidth={1.65} />}
+                  <span className="rail-label">{label}</span>
+                  {shortcut && <kbd>{shortcut}</kbd>}
+                  {badge && <i className="rail-badge">{badge}</i>}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="rail-bottom">
+            <Link href="/team" prefetch={false} className="rail-link" aria-label="Team"><Users size={20} /><span className="rail-label">Team</span></Link>
+            <button className="rail-link" aria-label="Upgrade"><Zap size={20} /><span className="rail-label">Upgrade</span></button>
+            <Link href="/settings" prefetch={false} className="rail-link" aria-label="Settings"><Settings size={20} /><span className="rail-label">Settings</span></Link>
+            <button className="rail-link" aria-label="More"><span className="more-dots">•••</span><span className="rail-label">More</span></button>
+          </div>
+        </aside>
+
+        <button className="mobile-menu icon-button" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle navigation">
+          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+
+        {secondary && <aside className="secondary-nav">{secondary}</aside>}
+
+        <header className="topbar">
+          <strong className="page-label">{title}</strong>
+          <form className="global-search" onSubmit={submitSearch}>
+            <Search size={17} />
+            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search by title or keyword" aria-label="Global search" />
+            <kbd>Ctrl + K</kbd>
+          </form>
+          <div className="top-actions">
+            <button className="upgrade-button">Upgrade</button>
+            <div className="capture-group">
+              <button className="capture-button" onClick={openCapture}><Video size={17} /><span>Capture</span></button>
+              <button className="capture-more" onClick={openCapture} aria-label="Capture options"><ChevronDown size={15} /></button>
+            </div>
+            <button className="icon-button top-icon" aria-label="Voice input"><Mic size={19} /></button>
+            <button className="icon-button top-icon notification" aria-label="Notifications"><Bell size={19} /><i /></button>
+            <button className="avatar-button" onClick={() => setProfileOpen((value) => !value)} aria-label="Profile" aria-expanded={profileOpen}>AT</button>
+          </div>
+        </header>
+
+        {profileOpen && (
+          <>
+            <button className="popover-scrim" aria-label="Close profile menu" onClick={() => setProfileOpen(false)} />
+            <div className="profile-menu" role="menu">
+              <section className="profile-overview">
+                <div className="profile-identity"><span>AT</span><div><strong>Hi Aryan</strong><small>aryantyagi0504@gmail.com</small></div></div>
+                <div className="plan-row"><span>Free</span><strong>Unlimited meetings</strong></div>
+                <div className="storage-row"><span>Storage</span><small>0 / 400 mins</small><i><b /></i></div>
+                <nav>
+                  <Link href="/referrals" prefetch={false}><Gift size={17} /> Refer and Earn $5</Link>
+                  <Link href="/settings" prefetch={false}><Settings size={17} /> Settings</Link>
+                  <Link href="/devices" prefetch={false}><Laptop size={17} /> Manage Devices</Link>
+                  <Link href="/platform-rules" prefetch={false}><ShieldCheck size={17} /> Platform Rules</Link>
+                  <button><LogOut size={17} /> Logout</button>
+                </nav>
+              </section>
+              <section className="profile-apps">
+                <article><div><UserRound size={18} /><span><strong>Mobile App</strong><small>Transcribe and summarize in-person conversations with mobile app.</small></span></div></article>
+                <article><div><ExternalLink size={18} /><span><strong>Chrome Extension</strong><small>Record and transcribe Google Meet calls without Fireflies notetaker bot.</small></span></div><button>Install</button></article>
+                <button className="desktop-download"><Laptop size={17} /> Download Fireflies Desktop App</button>
+              </section>
+            </div>
+          </>
+        )}
+
+        <main className={`app-main ${secondary ? "with-secondary" : ""}`}>{children}</main>
+        <button className="help-bubble" aria-label="Help"><CircleHelp size={24} /></button>
+
+        {dialog === "schedule" && (
+          <div className="dialog-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setDialog(null); }}>
+            <section className="schedule-dialog" role="dialog" aria-modal="true" aria-labelledby="schedule-title">
+              <button className="modal-close" onClick={() => setDialog(null)} aria-label="Close"><X size={18} /></button>
+              <h2 id="schedule-title">Schedule Meeting</h2>
+              <p>Your AI Notetaker will be invited to the calendar meeting to record, transcribe and summarize.</p>
+              <a href="https://calendar.google.com/calendar/u/0/r/eventedit" target="_blank" rel="noreferrer"><CalendarDays size={18} /> Google Calendar</a>
+              <a href="https://outlook.live.com/calendar/0/deeplink/compose" target="_blank" rel="noreferrer"><CalendarDays size={18} /> Microsoft Outlook</a>
+            </section>
+          </div>
+        )}
+
+        {dialog === "capture" && (
+          <div className="dialog-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setDialog(null); }}>
+            <form className="capture-dialog" role="dialog" aria-modal="true" aria-labelledby="capture-title" onSubmit={submitCapture}>
+              <button type="button" className="modal-close" onClick={() => setDialog(null)} aria-label="Close"><X size={18} /></button>
+              <h2 id="capture-title">Add to live meeting</h2>
+              <label>Name your meeting <span>(Optional)</span><input value={meetingName} onChange={(event) => setMeetingName(event.target.value)} /></label>
+              <div className="meeting-link-group">
+                <label htmlFor="meeting-link">Meeting link</label>
+                <p>Capture meetings from GMeet, Zoom, MS teams, and <button type="button">more.</button></p>
+                <div className="meeting-link-field"><Video size={18} /><input id="meeting-link" type="url" required placeholder="Paste meeting link" value={meetingLink} onChange={(event) => setMeetingLink(event.target.value)} /></div>
+              </div>
+              <label>Meeting language<select value={meetingLanguage} onChange={(event) => setMeetingLanguage(event.target.value)}><option>English (Global)</option><option>English (US)</option><option>English (UK)</option><option>Hindi</option><option>Spanish</option></select></label>
+              <div className="modal-actions"><button type="button" className="secondary-button" onClick={() => setDialog(null)}>Cancel</button><button type="submit" className="primary-button">Start Capturing</button></div>
+            </form>
+          </div>
+        )}
+      </div>
+    </ShellActionsContext.Provider>
+  );
+}
+
+export function MeetingsNav() {
+  return (
+    <>
+      <div className="secondary-title"><span>Meetings</span></div>
+      <div className="channel-search"><Search size={16} /><input placeholder="Search channels" /></div>
+      <nav className="secondary-links">
+        <Link className="active" href="/meetings"><span>#</span> My Meetings</Link>
+        <Link href="/meetings"><MonitorUp size={17} /> All Meetings</Link>
+        <Link href="/meetings"><Bot size={17} /> Voice Agent Meetings</Link>
+      </nav>
+      <div className="channels-box">
+        <p>All channels</p>
+        <span className="channel-hash">#</span>
+        <strong>Create channels to organize your conversations</strong>
+        <button><span>+</span> Channel</button>
+      </div>
+    </>
+  );
+}
+
+export function FredNav() {
+  return (
+    <>
+      <div className="secondary-title"><span>AskFred</span></div>
+      <nav className="secondary-links fred-links">
+        <button><span>+</span> New Chat</button>
+        <button><Search size={17} /> Search</button>
+        <button><Layers3 size={17} /> Connectors</button>
+      </nav>
+      <div className="chat-empty">
+        <div className="chat-skeleton"><i /><i /></div>
+        <strong>No chats yet</strong>
+        <p>Your chats will appear here once you start one.</p>
+      </div>
+    </>
+  );
+}
