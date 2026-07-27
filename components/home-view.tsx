@@ -24,7 +24,7 @@ export function HomeView() {
     <div className="home-page">
       <section className="welcome-panel">
         <div className="welcome-copy">
-          <h1>Welcome Aboard, Aryan!</h1>
+          <h1>Welcome Aboard, User!</h1>
           <p>Fireflies is now ready to automate your meetings and streamline your workflows.</p>
         </div>
         <div className="overview-video">
