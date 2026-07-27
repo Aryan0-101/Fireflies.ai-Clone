@@ -151,29 +151,22 @@ export function AppShell({
         )}
 
         <aside className={`icon-rail ${mobileOpen ? "open" : ""}`}>
-          <div className="rail-brand-row">
+          <div className="rail-brand-row" style={{ alignItems: "center", borderBottom: railExpanded ? "1px solid var(--border)" : "none", paddingBottom: railExpanded ? "12px" : "16px", marginBottom: railExpanded ? "12px" : "0" }}>
             {railExpanded ? (
-              <Link href="/" className="rail-logo" aria-label="Home">
-                <FirefliesMark size={24} />
-                <span className="rail-wordmark">fireflies.ai</span>
-              </Link>
+              <div className="rail-profile-expanded" style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
+                <button className="avatar-button" onClick={() => setProfileOpen((value) => !value)} aria-label="Profile" aria-expanded={profileOpen} style={{ width: 28, height: 28, fontSize: 12 }}>U</button>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: "var(--ink)" }}>User</span>
+                  <span style={{ fontSize: 11, color: "var(--muted)" }}>Free Plan</span>
+                </div>
+              </div>
             ) : (
-              <button className="avatar-button" onClick={() => setProfileOpen((value) => !value)} aria-label="Profile" aria-expanded={profileOpen} style={{ width: 28, height: 28, fontSize: 12 }}>AT</button>
+              <button className="avatar-button" onClick={() => setProfileOpen((value) => !value)} aria-label="Profile" aria-expanded={profileOpen} style={{ width: 28, height: 28, fontSize: 12 }}>U</button>
             )}
             <button className="rail-toggle" onClick={() => setRailExpanded((value) => !value)} aria-label={railExpanded ? "Collapse sidebar" : "Expand sidebar"}>
               {railExpanded ? <ChevronLeft size={17} /> : <ChevronRight size={17} />}
             </button>
           </div>
-
-          {railExpanded && (
-            <div className="rail-profile-expanded" style={{ padding: "0 16px 12px", borderBottom: "1px solid var(--border)", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
-              <button className="avatar-button" onClick={() => setProfileOpen((value) => !value)} aria-label="Profile" aria-expanded={profileOpen} style={{ width: 28, height: 28, fontSize: 12 }}>AT</button>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <span style={{ fontSize: 13, fontWeight: 500, color: "var(--ink)" }}>Aryan Tyagi</span>
-                <span style={{ fontSize: 11, color: "var(--muted)" }}>Free Plan</span>
-              </div>
-            </div>
-          )}
 
           <nav className="rail-nav">
             {nav.map(({ label, href, icon: Icon, shortcut, badge }, index) => {
