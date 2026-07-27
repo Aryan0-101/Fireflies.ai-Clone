@@ -10,9 +10,6 @@ backend/.pytest_cache/
 verification/
 .env
 .env.local
-clone.png
-original.css
-original.html
 cookies.json
 app.fireflies.ai/
 reference_capture/
